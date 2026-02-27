@@ -26,9 +26,9 @@ const CanvasLoader = () => (
 
 const calculateYearsOfExperience = () => {
   const experiences = [
-    { start: '2023-02-01', end: '2025-08-01' },
-    { start: '2020-06-01', end: '2020-10-01' },
-    { start: '2025-01-01', end: '' }, 
+    { start: '2023-02-01', end: '2025-08-01' }, // As Softech
+    { start: '2020-06-01', end: '2020-10-01' },// Volstory
+    { start: '2025-12-01', end: '' }, // skr technosoft (current)
   ];
 
   const today = new Date();
