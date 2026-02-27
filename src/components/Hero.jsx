@@ -26,29 +26,44 @@ const CanvasLoader = () => (
 
 const calculateYearsOfExperience = () => {
   const experiences = [
-    { start: '2023-02-01', end: '2025-08-01' }, // As Softech
-    { start: '2020-06-01', end: '2020-10-01' }  // Volstory
+    { start: '2023-02-01', end: '2025-08-01' },
+    { start: '2020-06-01', end: '2020-10-01' },
+    { start: '2025-01-01', end: '' }, 
   ];
 
-  // Calculate historical experience
-  const totalHistoricalMonths = experiences.reduce((total, exp) => {
-    const startDate = new Date(exp.start);
-    const endDate = new Date(exp.end);
-    const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 +
-                   (endDate.getMonth() - startDate.getMonth());
-    return total + months;
+  const today = new Date();
+
+  let intervals = experiences.map(exp => {
+    const start = new Date(exp.start);
+    let end = exp.end ? new Date(exp.end) : today;
+    if (end > today) end = today;
+    return { start, end };
+  });
+
+  intervals.sort((a, b) => a.start - b.start);
+
+  const mergedIntervals = [];
+  let currentInterval = intervals[0];
+
+  for (let i = 1; i < intervals.length; i++) {
+    const nextInterval = intervals[i];
+    if (nextInterval.start <= currentInterval.end) {
+      currentInterval = {
+        start: currentInterval.start,
+        end: new Date(Math.max(currentInterval.end.getTime(), nextInterval.end.getTime()))
+      };
+    } else {
+      mergedIntervals.push(currentInterval);
+      currentInterval = nextInterval;
+    }
+  }
+  mergedIntervals.push(currentInterval);
+
+  const totalMonths = mergedIntervals.reduce((total, interval) => {
+    return total + (interval.end.getFullYear() - interval.start.getFullYear()) * 12 + (interval.end.getMonth() - interval.start.getMonth());
   }, 0);
 
-  // Add current experience from last work date to today
-  const lastWorkEndDate = new Date('2025-08-01'); // Last work end date
-  const today = new Date();
-  const currentMonths = (today.getFullYear() - lastWorkEndDate.getFullYear()) * 12 +
-                        (today.getMonth() - lastWorkEndDate.getMonth());
-
-  const totalMonths = totalHistoricalMonths + Math.max(0, currentMonths);
-  const years = totalMonths / 12;
-
-  return Math.ceil(years); // Round up to show more experience
+  return (totalMonths / 12).toFixed(1);
 };
 
 const FloatingGeometry = ({ position, rotation, scale, color }) => {
